@@ -20,6 +20,7 @@ import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
+import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 
 public class AppStartup extends Activity {
@@ -41,7 +42,7 @@ public class AppStartup extends Activity {
         super.onCreate(savedInstanceState);
 
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
-        Fabric.with(this, new Twitter(authConfig));     setContentView(R.layout.activity_app_startup);
+        Fabric.with(this, new Twitter(authConfig), new TweetComposer());     setContentView(R.layout.activity_app_startup);
 
         googleClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)

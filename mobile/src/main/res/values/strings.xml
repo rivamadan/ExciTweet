@@ -5,4 +5,7 @@
     <string name="notifi_text">Tweet it!</string>
     <string name="camera">Camera</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_tweet">TweetActivity</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>
