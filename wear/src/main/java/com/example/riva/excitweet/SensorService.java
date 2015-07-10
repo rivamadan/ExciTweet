@@ -81,17 +81,16 @@ public class SensorService extends Service {
 
                 long curTime = System.currentTimeMillis();
 
-                if (lastUpdate == 0 || ((curTime - lastUpdate) > 100)) {
+                if (lastUpdate == 0 || ((curTime - lastUpdate) > 200)) {
                     long diffTime = (curTime - lastUpdate);
                     lastUpdate = curTime;
 
                     float excite = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
 
                     if (excite > EXCITE_THRESHOLD) {
-                        Log.v("myTag", "inside: " + excite);
                         MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, "/mobile-listener-service", new byte[3]).await();
                         if (result.getStatus().isSuccess()) {
-                            Log.v("myTag", "Sensor Message: sent to: " + nodeId);
+                            Log.v("myTag", "Sensor Message: sent to: " + nodeId + result.getStatus().getStatusCode());
                         }
                         else {
                             // Log an error
