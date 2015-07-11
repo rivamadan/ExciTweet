@@ -1,7 +1,6 @@
 package com.example.riva.excitweet;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -33,16 +32,13 @@ public class AppStartup extends Activity {
 
     private GoogleApiClient googleClient;
 
-    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
-    private Uri fileUri;
-    public static final int MEDIA_TYPE_IMAGE = 1;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
-        Fabric.with(this, new Twitter(authConfig), new TweetComposer());     setContentView(R.layout.activity_app_startup);
+        Fabric.with(this, new Twitter(authConfig), new TweetComposer());
+        setContentView(R.layout.activity_app_startup);
 
         googleClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)

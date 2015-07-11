@@ -17,7 +17,6 @@ public class WearListenerService extends WearableListenerService {
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
-
         startService(new Intent(this, SensorService.class));
     }
 

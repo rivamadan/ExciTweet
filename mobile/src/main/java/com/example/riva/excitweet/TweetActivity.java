@@ -14,9 +14,9 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
 
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
@@ -73,14 +73,14 @@ public class TweetActivity extends Activity {
         // using Environment.getExternalStorageState() before doing this.
 
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "MyCameraApp");
+                Environment.DIRECTORY_PICTURES), "ExciTweet");
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
 
         // Create the storage directory if it does not exist
         if (! mediaStorageDir.exists()){
             if (! mediaStorageDir.mkdirs()){
-                Log.d("MyCameraApp", "failed to create directory");
+                Log.d("ExciTweet", "failed to create directory");
                 return null;
             }
         }
@@ -98,20 +98,23 @@ public class TweetActivity extends Activity {
         return mediaFile;
     }
 
+    private static final int TWEET_COMPOSER_REQUEST_CODE = 101;
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
                 // Image captured and saved to fileUri specified in the Intent
 
-                TweetComposer.Builder builder = new TweetComposer.Builder(this)
+                Intent intent = new TweetComposer.Builder(this)
                         .text("#cs160excited")
-                        .image(fileUri);
-                builder.show();
+                        .image(fileUri)
+                        .createIntent();
+                startActivityForResult(intent, TWEET_COMPOSER_REQUEST_CODE);
 
+            } if (requestCode == TWEET_COMPOSER_REQUEST_CODE) {
                 TwitterApiClient twitterApiClient = TwitterCore.getInstance().getApiClient();
                 SearchService service = twitterApiClient.getSearchService();
-//                final long maxId = 0;
 
                 service.tweets("#cs160excited", null, null, null, null, null, null, null, null, true, new Callback<Search>() {
                     @Override
@@ -131,10 +134,9 @@ public class TweetActivity extends Activity {
                                 break;
                             }
                         }
+                        System.out.println(urlString);
 
-                        Intent intent = new Intent(getBaseContext(), PictureService.class);
-                        intent.putExtra("url", urlString);
-                        startService(intent);
+                        new GetPictureTask().execute(urlString);
                     }
 
                     @Override
@@ -143,6 +145,63 @@ public class TweetActivity extends Activity {
                     }
                 });
             }
+        }
+    }
+
+    class GetPictureTask extends AsyncTask<String, Void, Bitmap> {
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            try {
+                URL url = new URL(params[0]);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                return BitmapFactory.decodeStream(input);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        protected void onPostExecute(Bitmap bitmap) {
+            if (bitmap == null) {
+                bitmap = BitmapFactory.decodeResource(getBaseContext().getResources(), R.drawable.jump);
+            }
+            NotificationManagerCompat notificationManager;
+            int notificationId = 2;
+
+            PendingIntent pendingIntent = PendingIntent.getActivity(
+                    getBaseContext(),
+                    0,
+                    new Intent(),
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+
+            Bitmap icon = BitmapFactory.decodeResource(getBaseContext().getResources(), R.drawable.ic_thumbsup);
+
+            NotificationCompat.Builder nBuilder =
+                    new NotificationCompat.Builder(getBaseContext())
+                            .setSmallIcon(R.drawable.ic_thumbsup)
+                            .setLargeIcon(icon)
+                            .setContentTitle(":O LOOK!!")
+                            .setContentText("Somebody else was excited!")
+                            .setContentIntent(pendingIntent)
+                            .setAutoCancel(true)
+                            .extend(new NotificationCompat.WearableExtender()
+                                    .setBackground(bitmap)
+                                    .setHintHideIcon(true)
+                                    .setContentIcon(R.drawable.ic_thumbsup)
+                                    .setContentIconGravity(Gravity.START));
+
+
+            Notification notification = nBuilder.build();
+
+            notification.defaults |= Notification.DEFAULT_VIBRATE;
+            notification.defaults |= Notification.DEFAULT_SOUND;
+
+            notificationManager = NotificationManagerCompat.from(getBaseContext());
+            notificationManager.notify(notificationId, notification);
         }
     }
 

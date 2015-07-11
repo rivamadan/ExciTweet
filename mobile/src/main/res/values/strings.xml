@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">ExciTweet</string>
 
-    <string name="notifi_title">EXCITED!?</string>
-    <string name="notifi_text">Tweet it!</string>
     <string name="camera">Camera</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_tweet">TweetActivity</string>
