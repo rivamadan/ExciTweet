@@ -172,12 +172,6 @@ public class TweetActivity extends Activity {
             NotificationManagerCompat notificationManager;
             int notificationId = 2;
 
-            PendingIntent pendingIntent = PendingIntent.getActivity(
-                    getBaseContext(),
-                    0,
-                    new Intent(),
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-
             Bitmap icon = BitmapFactory.decodeResource(getBaseContext().getResources(), R.drawable.ic_thumbsup);
 
             NotificationCompat.Builder nBuilder =
@@ -186,7 +180,6 @@ public class TweetActivity extends Activity {
                             .setLargeIcon(icon)
                             .setContentTitle(":O LOOK!!")
                             .setContentText("Somebody else was excited!")
-                            .setContentIntent(pendingIntent)
                             .setAutoCancel(true)
                             .extend(new NotificationCompat.WearableExtender()
                                     .setBackground(bitmap)
